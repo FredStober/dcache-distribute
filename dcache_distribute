@@ -1,0 +1,3 @@
+#!/usr/bin/env python
+# Tool to distribute all datasets on dCache - uses simple greedy algorithm
+# by Fred Stober (stober@cern.ch)
