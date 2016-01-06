@@ -6,3 +6,4 @@ import sys, os, copy
 from toolKIT.utils import expath, progress, get_cached
 from toolKIT.chimera import dCacheInfo, get_chimera_data
 from toolKIT.dCache import get_pool_infos
+from toolKIT.dCache_distribute import filterMoveable, writeTransferCommands, writeTransferFile
