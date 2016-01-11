@@ -17,3 +17,20 @@ dCacheWebHost = 'http://192.108.45.36:2288'
 #cache_chimera_data(expath('~/storage_scratch/chimera-dump'),
 #	expath('~/storage_scratch/storage-information'), 201407160705)
 chimera_path = expath('~/storage_scratch/chimera-dump/current')
+
+def getPoolOverview():
+	result_flat = {}
+	result_total = 0
+	for pool in get_pool_infos(dCacheWebHost):
+		if 'space' not in pool:
+			print 'Pool %s skipped - no space information available!', pool['name']
+			continue
+#		if not poolFilter(pool):
+#			continue
+		if not pool['name'].endswith('D_cms'):
+			continue
+		pool['free'] = pool['space']['free'] + pool['space']['removable']
+		result_flat[pool['name']] = pool
+		result_total += pool['space']['total']
+	return (result_flat, result_total)
+
