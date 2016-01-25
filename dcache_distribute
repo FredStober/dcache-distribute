@@ -34,3 +34,16 @@ def getPoolOverview():
 		result_total += pool['space']['total']
 	return (result_flat, result_total)
 
+# Return dictionary ds -> {'files': ds files, 'size': ds size, <pool>: size on pool, ...}
+def getDataPackagesBefore():
+	result = {}
+	iter_chimera = get_chimera_data(chimera_path)
+	for entry in filterMoveable(progress(iter_chimera)):
+		ds = fn2ddn(entry[dCacheInfo.pfn])
+		ds_dict = result.setdefault(ds, {})
+		ds_dict['files'] = ds_dict.get('files', 0) + 1
+		entry_locations = entry.get(dCacheInfo.location, [])
+		ds_dict['size'] = ds_dict.get('size', 0) + entry[dCacheInfo.size] * len(entry_locations)
+		for loc in entry_locations:
+			ds_dict[loc] = ds_dict.get(loc, 0) + entry[dCacheInfo.size]
+	return result
