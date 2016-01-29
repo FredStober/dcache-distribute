@@ -47,3 +47,30 @@ def getDataPackagesBefore():
 		for loc in entry_locations:
 			ds_dict[loc] = ds_dict.get(loc, 0) + entry[dCacheInfo.size]
 	return result
+
+# Return dictionary ds -> {<pool>: size delta to reach optimum, ...}
+def getPoolTargetSize(packages, pools):
+	result = {}
+	for ds in sorted(packages, key = lambda k: packages[k]['size']):
+		if '/disk-only/' not in ds:
+			continue
+		ignore = False
+		# IGNORED, 'unmerged']:#, 'disk-only/dev', '/user', '/temp/']:
+		for k in ['PhEDEx_Debug', 'LoadTest']:
+			if k in ds:
+				ignore = True
+		if ignore:
+			continue
+		if ds.endswith('store'):
+			continue
+		if packages[ds]['size'] == 0:
+			continue
+		imbalance = {}#'avg': packages[ds]['size'] / packages[ds]['files']}
+		for pool in sorted(pools):
+			# positive => migrate towards, negative => migrate away
+			pool_frac = pools[pool]['space']['total'] / pools_total
+			ds_usage_optimum = packages[ds]['size'] * pool_frac
+			imbalance[pool] = ds_usage_optimum - packages[ds].get(pool, 0)
+		result[ds] = imbalance
+
+	return result
