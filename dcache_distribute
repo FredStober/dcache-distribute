@@ -74,3 +74,39 @@ def getPoolTargetSize(packages, pools):
 		result[ds] = imbalance
 
 	return result
+
+
+# Return list of move operations to reach optimum within a dataset
+def getTransfers(ds_imbalance):
+	result = []
+	result_packages = {}
+	iter_chimera = get_chimera_data(chimera_path)
+	for entry in filterMoveable(progress(iter_chimera)):
+		ds = fn2ddn(entry[dCacheInfo.pfn])
+		if ds not in ds_imbalance:
+			continue
+		size = entry[dCacheInfo.size]
+		ds_poolimbalance = ds_imbalance[ds]
+		package_info = result_packages.setdefault(ds, {})
+		package_info['files'] = package_info.get('files', 0) + 1
+		moveFile = True
+		targets = []
+		for source_pool in entry[dCacheInfo.location]:
+			source_goal = ds_poolimbalance.get(source_pool)
+			if source_goal and moveFile:
+				if source_goal < 0:
+					target_pool = sorted(ds_poolimbalance, key = lambda k: -ds_poolimbalance[k])[0]
+					if (target_pool not in entry[dCacheInfo.location]) and (target_pool not in targets):
+						target_goal = ds_poolimbalance[target_pool]
+						if (source_goal + size < 0):# and (target_goal - size > 0):
+							ds_poolimbalance[source_pool] = ds_poolimbalance[source_pool] + size
+							ds_poolimbalance[target_pool] = ds_poolimbalance[target_pool] - size
+							result.append((entry[dCacheInfo.dcache_id], size, source_pool, target_pool))
+							package_info[target_pool] = package_info.get(target_pool, 0) + size
+							package_info['size'] = package_info.get('size', 0) + size
+							targets.append(target_pool)
+#							moveFile = False # Move only one file replica
+							continue
+			package_info[source_pool] = package_info.get(source_pool, 0) + size
+			package_info['size'] = package_info.get('size', 0) + size
+	return (result, ds_imbalance, result_packages)
