@@ -110,3 +110,16 @@ def getTransfers(ds_imbalance):
 			package_info[source_pool] = package_info.get(source_pool, 0) + size
 			package_info['size'] = package_info.get('size', 0) + size
 	return (result, ds_imbalance, result_packages)
+
+# Returns dictionaries with transfer volumes by pool
+def getTransferVolumeByPool(transfer_list):
+	pool_in = {}
+	pool_out = {}
+	pool_delta = {}
+	for (dcache_id, size, source, target) in transfer_list:
+		pool_in[target] = pool_in.get(target, 0) + size
+		pool_delta[target] = pool_delta.get(target, 0) + size
+		pool_out[source] = pool_out.get(source, 0) - size
+		pool_delta[source] = pool_delta.get(source, 0) - size
+	return (pool_in, pool_out, pool_delta)
+
