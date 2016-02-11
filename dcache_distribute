@@ -123,3 +123,17 @@ def getTransferVolumeByPool(transfer_list):
 		pool_delta[source] = pool_delta.get(source, 0) - size
 	return (pool_in, pool_out, pool_delta)
 
+# Return dictionary with pool imbalances - after the inter-ds transfers are done
+def getPoolImbalance(pools, pools_total, pool_delta, packages):
+	allds_size = 0
+	for ds in packages:
+		allds_size += sum(map(lambda pool: packages[ds].get(pool, 0), pools))
+
+	result = {}
+	for pool in pools:
+		pool_usage_optimal = allds_size / pools_total * pools[pool]['space']['total']
+		pool_usage_new = sum(map(lambda ds: packages[ds].get(pool, 0), packages))
+		pool_delta.get(pool, 0) + pools[pool]['space']['used']
+		result[pool] = pool_usage_optimal - pool_usage_new # negative - move away; positive - migrate towards
+	return result
+
