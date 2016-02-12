@@ -137,3 +137,20 @@ def getPoolImbalance(pools, pools_total, pool_delta, packages):
 		result[pool] = pool_usage_optimal - pool_usage_new # negative - move away; positive - migrate towards
 	return result
 
+# Return dictionary of migrations on dataset level to balance global pools imbalances
+def getDSPoolTransfers(packages, pool_imbalance):
+	pool_source_list = filter(lambda p: pool_imbalance[p] < 0, pool_imbalance)
+	pool_target_list = filter(lambda p: pool_imbalance[p] > 0, pool_imbalance)
+	result = {}
+	for ds in packages:
+		for pool_source in filter(lambda p: p in packages[ds], pool_source_list):
+			ds_size = packages[ds].get(pool_source, 0)
+			if pool_imbalance[pool_source] + ds_size < 0:
+				for pool_target in filter(lambda p: p not in packages[ds], pool_target_list):
+					if (pool_target not in packages[ds]) and (pool_imbalance[pool_target] - ds_size > 0):
+						pool_imbalance[pool_source] = pool_imbalance[pool_source] + ds_size
+						pool_imbalance[pool_target] = pool_imbalance[pool_target] - ds_size
+						packages[ds][pool_target] = packages[ds].pop(pool_source)
+						result.setdefault(ds, []).append((pool_source, pool_target))
+						break
+	return result
