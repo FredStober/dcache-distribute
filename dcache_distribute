@@ -154,3 +154,26 @@ def getDSPoolTransfers(packages, pool_imbalance):
 						result.setdefault(ds, []).append((pool_source, pool_target))
 						break
 	return result
+
+# Return list of move operations to reach optimum within a pool
+def getFileTransfersFromPoolsTransfers(pool_transfers, pool_imbalance):
+	result = []
+	result_packages = {}
+	iter_chimera = get_chimera_data(chimera_path)
+	for entry in filterMoveable(progress(iter_chimera)):
+		ds = fn2ddn(entry[dCacheInfo.pfn])
+		if ds not in pool_transfers:
+			continue
+		size = entry[dCacheInfo.size]
+		package_info = result_packages.setdefault(ds, {})
+		package_info['files'] = package_info.get('files', 0) + 1
+		for (source_pool, target_pool) in pool_transfers[ds]:
+			if source_pool in entry.get(dCacheInfo.location, []):
+				source_goal = pool_imbalance.get(source_pool)
+				pool_imbalance[source_pool] = pool_imbalance[source_pool] + size
+				pool_imbalance[target_pool] = pool_imbalance[target_pool] - size
+				result.append((entry[dCacheInfo.dcache_id], size, source_pool, target_pool))
+			package_info[target_pool] = package_info.get(target_pool, 0) + size
+			package_info['size'] = package_info.get('size', 0) + size
+	return (result, pool_imbalance, result_packages)
+
