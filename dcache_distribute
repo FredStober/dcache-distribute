@@ -186,3 +186,29 @@ def getFileTransfersFromPoolsTransfers(pool_transfers, pool_imbalance):
 
 
 ##########################################################################
+
+print 'Getting pool overview...'
+(pools, pools_total) = getPoolOverview()
+print len(pools), 'disk-only pools found'
+print 'Getting file packages (~datasets)...'
+packages = getDataPackagesBefore()
+print len(packages), 'packages found', sum(map(lambda ds: packages[ds]['files'], packages)), 'files'
+print 'Calculating dataset and pool imbalance...'
+ds_imbalance = getPoolTargetSize(packages, pools)
+num_balanced_files = sum(map(lambda ds: packages[ds]['files'], ds_imbalance))
+print len(ds_imbalance), 'packages optimized', num_balanced_files, 'files'
+print 'Calculating transfers...'
+(transfer_list, ds_imbalance_new, packages_new) = getTransfers(copy.deepcopy(ds_imbalance))
+print len(transfer_list), 'transfers needed', '%.1f' % (float(len(transfer_list)) / num_balanced_files * 100.), '%'
+print 'Calculating transfer volumes...'
+(pool_in, pool_out, pool_delta) = getTransferVolumeByPool(transfer_list)
+print 'Calculating global pool imbalances...'
+pool_imbalance = getPoolImbalance(pools, pools_total, pool_delta, packages_new)
+pool_ds_transfers = getDSPoolTransfers(packages_new, copy.deepcopy(pool_imbalance))
+print len(pool_ds_transfers), 'global pool migrations of datasets'
+print 'Calculating global pool transfers...'
+(transfer_list_g, pool_imbalance_new, packages_new_g) = getFileTransfersFromPoolsTransfers(pool_ds_transfers, copy.deepcopy(pool_imbalance))
+print len(transfer_list_g), 'transfers needed', '%.1f' % (float(len(transfer_list_g)) / num_balanced_files * 100.), '%'
+
+##########################################################################
+
