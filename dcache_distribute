@@ -212,3 +212,9 @@ print len(transfer_list_g), 'transfers needed', '%.1f' % (float(len(transfer_lis
 
 ##########################################################################
 
+print '=' * 50
+print 'Results:'
+
+writeTransferFile(expath('~/software/tmp/dcache_distribute_transfers_global.json'), transfer_list_g)
+writeTransferFile(expath('~/software/tmp/dcache_distribute_transfers.json'), transfer_list)
+
