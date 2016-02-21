@@ -218,3 +218,10 @@ print 'Results:'
 writeTransferFile(expath('~/software/tmp/dcache_distribute_transfers_global.json'), transfer_list_g)
 writeTransferFile(expath('~/software/tmp/dcache_distribute_transfers.json'), transfer_list)
 
+def printImbalance(ds_imbalance, packages):
+	for ds in sorted(ds_imbalance):
+		print ds
+		for pool in sorted(ds_imbalance[ds], key = lambda x: ds_imbalance[ds][x]):
+			print '\t', pool, ds_imbalance[ds][pool] / (packages[ds]['size'] / packages[ds]['files'])
+		return
+
