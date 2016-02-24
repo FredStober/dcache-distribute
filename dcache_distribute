@@ -225,3 +225,24 @@ def printImbalance(ds_imbalance, packages):
 			print '\t', pool, ds_imbalance[ds][pool] / (packages[ds]['size'] / packages[ds]['files'])
 		return
 
+#printImbalance(ds_imbalance, packages)
+#printImbalance(ds_imbalance_new, packages_new)
+
+def writeDSImbalanceMetric():
+	import math
+	fp = open(expath('~/software/tmp/dcache_distribute_imbalance_metric'), 'w')
+	for ds in ds_imbalance:
+		metric_old = math.sqrt(sum(map(lambda p: (ds_imbalance[ds][p] / packages[ds]['size'])**2, ds_imbalance[ds])))
+		metric_new = math.sqrt(sum(map(lambda p: (ds_imbalance_new[ds][p] / packages[ds]['size'])**2, ds_imbalance[ds])))
+		fp.write(ds + ' ' + str(metric_old) + ' ' + str(metric_new) + ' ')
+		fp.write(str(packages[ds]['size']) + ' ' + str(packages[ds]['files']) + '\n')
+		total_imb_old = int(sum(map(lambda p: ds_imbalance[ds].get(p, 0), ds_imbalance[ds])))
+		total_imb_new = int(sum(map(lambda p: ds_imbalance_new[ds].get(p, 0), ds_imbalance[ds])))
+		if total_imb_old or total_imb_new:
+			print 'Total imbalance is inconsistent'
+			print ds, packages[ds]['size'], packages[ds]['files'], total_imb_new, total_imb_old
+	fp.close()
+	print 'Written result to', fp.name
+	happyface_upload(expath('~/software/tmp/dcache_distribute_imbalance_metric'))
+	print '... and uploaded it to the HappyFace machine.'
+
