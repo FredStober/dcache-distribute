@@ -246,3 +246,4 @@ def writeDSImbalanceMetric():
 	happyface_upload(expath('~/software/tmp/dcache_distribute_imbalance_metric'))
 	print '... and uploaded it to the HappyFace machine.'
 
+writeDSImbalanceMetric()
