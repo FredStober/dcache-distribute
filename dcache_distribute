@@ -247,3 +247,38 @@ def writeDSImbalanceMetric():
 	print '... and uploaded it to the HappyFace machine.'
 
 writeDSImbalanceMetric()
+
+def printPoolChanges(pools, pool_delta, pool_in, pool_out, packages, packages_new):
+	print
+	print
+	print 'Pool changes'
+	print '-' * 40
+	print 'I: in, O: out, D: delta, T: total space, F: free space'
+	print 'Pool info | B: used, b: used rel., A: predicted used, a: predicted used rel.'
+	print '  Dataset | U: used, u: used rel., P: predicted used, p: predicted used rel.'
+	for pool in sorted(pool_delta):
+		pool_free = (pools[pool]['space']['free'] + pools[pool]['space']['removable'])
+
+		print pool,
+		print 'I%7.3f' % (pool_in[pool] / 1.e12),#
+		print 'O%7.3f' % (pool_out[pool] / 1.e12),
+#		print 'D%7.3f' % (pool_delta[pool] / 1.e12),
+		print 'T%7.3f' % (pools[pool]['space']['total'] / 1.e12),
+#		print 'F%7.3f' % (pools[pool]['space']['free'] / 1.e12),
+		print '|',
+		print 'B%7.3f' % (pools[pool]['space']['used'] / 1.e12),
+		print 'b%.3f' % (pools[pool]['space']['used'] / pools[pool]['space']['total']),
+#		print 'A%.3f' % (float(pool_delta[pool] + pools[pool]['space']['used']) / 1.e12),
+#		print 'a%.3f' % (float(pool_delta[pool] + pools[pool]['space']['used']) / pools[pool]['space']['total']),
+		print '|',
+		print 'U%7.3f' % (sum(map(lambda ds: packages.get(ds, {}).get(pool, 0), packages_new)) / 1.e12),
+		print 'u%.3f' % (sum(map(lambda ds: packages.get(ds, {}).get(pool, 0), packages_new)) / pools[pool]['space']['total']),
+		print 'P%7.3f' % (sum(map(lambda ds: packages_new.get(ds, {}).get(pool, 0), packages_new)) / 1.e12),
+		print 'p%.3f' % (sum(map(lambda ds: packages_new.get(ds, {}).get(pool, 0), packages_new)) / pools[pool]['space']['total'] ),
+		print
+
+	print '              Total:',
+	print 'I%7.3f' % (sum(map(lambda pool: pool_in[pool] / 1.e12, pool_delta))),
+	print 'O%7.3f' % (sum(map(lambda pool: pool_out[pool] / 1.e12, pool_delta)))
+
+printPoolChanges(pools, pool_delta, pool_in, pool_out, packages, packages_new)
