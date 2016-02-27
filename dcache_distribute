@@ -282,3 +282,16 @@ def printPoolChanges(pools, pool_delta, pool_in, pool_out, packages, packages_ne
 	print 'O%7.3f' % (sum(map(lambda pool: pool_out[pool] / 1.e12, pool_delta)))
 
 printPoolChanges(pools, pool_delta, pool_in, pool_out, packages, packages_new)
+
+
+def printGlobalImprovement(pool_imbalance, pool_imbalance_new):
+	print
+	print
+	print 'Improvement (delta_opt) due to global balancing'
+	print '(imbalances before and after balancing operation)'
+	print '-' * 40
+	for x in sorted(pool_imbalance, key = lambda x: pool_imbalance[x]):
+		print x, '%+.3f' % (pool_imbalance[x] / 1.e12), '%+.3f' % (pool_imbalance_new[x] / 1.e12)
+	print
+
+printGlobalImprovement(pool_imbalance, pool_imbalance_new)
