@@ -295,3 +295,65 @@ def printGlobalImprovement(pool_imbalance, pool_imbalance_new):
 	print
 
 printGlobalImprovement(pool_imbalance, pool_imbalance_new)
+
+
+def printPoolDSDistribution(pools, pools_total, packages):
+	print
+	print
+	print 'Dataset distribution over pools'
+	print '-' * 40
+	poolDSNumber = {}
+	poolDSNumberGTP = {}
+	poolDSNumberLTP = {}
+	poolDSSize = {}
+	poolDSSizeGTP = {}
+	poolDSSizeLTP = {}
+	for ds in packages:
+		for pool in pools:
+			if packages[ds].get(pool, 0):
+				poolDSNumber[pool] = poolDSNumber.get(pool, 0) + 1
+				poolDSSize[pool] = poolDSSize.get(pool, 0) + packages[ds].get(pool, 0)
+				if packages[ds]['files'] >= len(pools):
+					poolDSNumberGTP[pool] = poolDSNumberGTP.get(pool, 0) + 1
+					poolDSSizeGTP[pool] = poolDSSizeGTP.get(pool, 0) + packages[ds].get(pool, 0)
+				else:
+					poolDSNumberLTP[pool] = poolDSNumberLTP.get(pool, 0) + 1
+					poolDSSizeLTP[pool] = poolDSSizeLTP.get(pool, 0) + packages[ds].get(pool, 0)
+	maxGTP = float(max(poolDSNumberGTP.values()))
+	for pool in sorted(poolDSNumber):
+		poolSize = float(pools[pool]['space']['total'])
+		poolFrac = poolSize / pools_total
+		print pool,
+
+		print 'total',
+		print '%5d  ' % poolDSNumber.get(pool, 0),
+		print '%5.1f%%' % (poolDSNumber.get(pool, 0) / float(len(packages)) * 100.),
+
+		print '(#f>=#p)',
+		print '%5d  ' % poolDSNumberGTP.get(pool, 0),
+		print '%5.1f%%' % (poolDSNumberGTP.get(pool, 0) / maxGTP * 100.),
+
+		print '(#f< #p)',
+		print '%5d  ' % poolDSNumberLTP.get(pool, 0),
+		dsFrac = poolDSNumberLTP.get(pool, 0) / float(sum(poolDSNumberLTP.values()))
+#		print '%5.1f%%' % (dsFrac * 100.),
+		print '%5.1f%%' % (dsFrac / poolFrac * 100.),
+		print
+		print ' ' * len(pool),
+
+		print '     ',
+		print '%5.1fTB' % (poolDSSize.get(pool, 0) / 1.e12),
+		print '%5.1f%%' % (poolDSSize.get(pool, 0) / poolSize * 100.),
+
+		print '        ',
+		print '%5.1fTB' % (poolDSSizeGTP.get(pool, 0) / 1.e12),
+		allDSSizeGTP = float(sum(poolDSSizeGTP.values()))
+		print '%5.1f%%' % (poolDSSizeGTP.get(pool, 0) / allDSSizeGTP / poolFrac * 100.),
+
+		print '        ',
+		print '%5.1fTB' % (poolDSSizeLTP.get(pool, 0) / 1.e12),
+#		print '%5.1f%%' % (poolDSSizeLTP.get(pool, 0) / poolSize * 100.),
+		print '%5.1f%%' % ((poolDSSizeLTP.get(pool, 0) / poolSize) / poolFrac * 100.),
+		print
+
+printPoolDSDistribution(pools, pools_total, packages_new)
