@@ -283,7 +283,6 @@ def printPoolChanges(pools, pool_delta, pool_in, pool_out, packages, packages_ne
 
 printPoolChanges(pools, pool_delta, pool_in, pool_out, packages, packages_new)
 
-
 def printGlobalImprovement(pool_imbalance, pool_imbalance_new):
 	print
 	print
@@ -295,7 +294,6 @@ def printGlobalImprovement(pool_imbalance, pool_imbalance_new):
 	print
 
 printGlobalImprovement(pool_imbalance, pool_imbalance_new)
-
 
 def printPoolDSDistribution(pools, pools_total, packages):
 	print
