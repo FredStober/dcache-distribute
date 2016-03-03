@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+# Tool to distribute a single datasets on dCache
+# (tries to accomplish an optimal distribution via simulated annealing)
+# by Fred Stober (stober@cern.ch)
