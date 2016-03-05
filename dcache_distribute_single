@@ -4,3 +4,4 @@
 # by Fred Stober (stober@cern.ch)
 
 import sys, os, copy, random, time, threading, optparse
+from toolKIT import json
