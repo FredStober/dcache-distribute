@@ -13,3 +13,16 @@ from toolKIT.dCache_distribute import filterMoveable, writeTransferCommands
 
 dCacheWebHost = 'http://192.108.45.36:2288'
 chimera_path = expath('~/storage_scratch/chimera-dump/current')
+
+parser = optparse.OptionParser()
+parser.add_option("-f", "--filename", dest="fn", default=None, help="select by filename")
+parser.add_option("-m", "--maxfiles", dest="maxfiles", default=None, type=int, help="select by max number of files in dataset")
+parser.add_option("-l", "--filelist", dest="filelist", default=None, help="file with fileinfos")
+parser.add_option("-S", "--store_filelist", dest="store_filelist", default=None, help="store fileinfos")
+parser.add_option("-L", "--load_transfers", dest="load_transfers", default=None, help="store transfers")
+
+parser.add_option("-t", "--threads", dest="Nthreads", default=10, type=int, help="number of threads")
+parser.add_option("-i", "--iterations", dest="Niter", default=100, type=int, help="number of iterations")
+parser.add_option("-s", "--max_steps", dest="Nsteps", default=36, type=int, help="number of steps")
+parser.add_option("-T", "--store_transfers", dest="store_transfers", default='transfers', help="store transfers")
+opts, args = parser.parse_args()
