@@ -26,3 +26,30 @@ parser.add_option("-i", "--iterations", dest="Niter", default=100, type=int, hel
 parser.add_option("-s", "--max_steps", dest="Nsteps", default=36, type=int, help="number of steps")
 parser.add_option("-T", "--store_transfers", dest="store_transfers", default='transfers', help="store transfers")
 opts, args = parser.parse_args()
+
+# Select files according to lfn / number of files in dataset
+def getFileInfos(opts):
+	if opts.filelist:
+		return json.load(open(opts.filelist))
+	fileInfos = []
+	ds_files = {}
+	if opts.maxfiles:
+		for entry in progress(filterMoveable(get_chimera_data(chimera_path))):
+			ds = fn2ddn(entry[dCacheInfo.pfn])
+			ds_files[ds] = ds_files.get(ds, 0) + 1
+		print len(ds_files), len(filter(lambda ds: ds_files.get(ds, 0) <= opts.maxfiles, ds_files))
+	for entry in progress(filterMoveable(get_chimera_data(chimera_path))):
+		if opts.fn and (opts.fn not in entry[dCacheInfo.pfn]):
+			continue
+		if opts.maxfiles:
+			ds = fn2ddn(entry[dCacheInfo.pfn])
+			if ds_files.get(ds, 0) > opts.maxfiles:
+				continue
+		if 'disk-only' not in entry[dCacheInfo.pfn]:
+			continue
+		for loc in entry[dCacheInfo.location]:
+			fileInfos.append((entry[dCacheInfo.dcache_id], loc, entry[dCacheInfo.size]))
+	if opts.store_filelist:
+		json.dump(fileInfos, open(opts.store_filelist, 'w'))
+	return fileInfos
+
