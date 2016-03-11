@@ -53,3 +53,8 @@ def getFileInfos(opts):
 		json.dump(fileInfos, open(opts.store_filelist, 'w'))
 	return fileInfos
 
+# Apply transfer list to fileinfos
+def applyTransfers(fileList, transferList):
+	idlocMap = dict(map(lambda (id, size, s, t): (id + s, t), transferList))
+	return map(lambda (id, loc, size): (id, idlocMap.get(id + loc, loc), size), fileList)
+
