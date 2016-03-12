@@ -58,3 +58,18 @@ def applyTransfers(fileList, transferList):
 	idlocMap = dict(map(lambda (id, size, s, t): (id + s, t), transferList))
 	return map(lambda (id, loc, size): (id, idlocMap.get(id + loc, loc), size), fileList)
 
+# Get distribution by pool from filelist
+def getPoolOverview(fi):
+	myFiles = {}
+	mySizes = {}
+	idlocset = set()
+	for fidx, fdata in enumerate(fi):
+		(id, loc, size) = fdata
+		idloc = id + loc
+		if idloc in idlocset:
+			return None
+		idlocset.add(idloc)
+		myFiles[loc] = myFiles.get(loc, 0) + 1
+		mySizes[loc] = mySizes.get(loc, 0) + size
+	return (myFiles, mySizes, idlocset)
+
