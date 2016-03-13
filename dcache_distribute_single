@@ -73,3 +73,89 @@ def getPoolOverview(fi):
 		mySizes[loc] = mySizes.get(loc, 0) + size
 	return (myFiles, mySizes, idlocset)
 
+# Optimize filelist to reach goals
+def optimizeFileInfos_annealing(fileInfos, goalFiles, goalSizes):
+	totalSize = sum(goalSizes.values())
+	pool_list = goalSizes.keys()
+
+	# Calculate metric - taking changes into account
+	def getMetric(fi, changes, curFiles, curSizes, curIDLocSet):
+		myFiles = dict(curFiles)
+		mySizes = dict(curSizes)
+		myIDLocSet = set(curIDLocSet)
+		for idx in changes:
+			(id, loc_old, size) = fi[idx]
+			loc_new = changes[idx]
+			if loc_old == loc_new:
+				continue
+			idloc_old = id + loc_old
+			idloc_new = id + loc_new
+			if idloc_new in myIDLocSet:
+				return 1e10
+			myIDLocSet.remove(idloc_old)
+			myIDLocSet.add(idloc_new)
+			myFiles[loc_old] = myFiles.get(loc_old, 0) - 1
+			mySizes[loc_old] = mySizes.get(loc_old, 0) - size
+			myFiles[loc_new] = myFiles.get(loc_new, 0) + 1
+			mySizes[loc_new] = mySizes.get(loc_new, 0) + size
+
+		result = 0
+		for pool in myFiles:
+			result += ((myFiles.get(pool, 0) - goalFiles.get(pool, 0)) / float(len(fileInfos)))**2
+			result += ((mySizes.get(pool, 0) - goalSizes.get(pool, 0)) / float(totalSize))**2
+		return result
+
+	# Minizize metric
+	fileInfos_old = list(fileInfos)
+	curFiles, curSizes, curIDLocSet = getPoolOverview(fileInfos)
+	m_start = getMetric(fileInfos, {}, curFiles, curSizes, curIDLocSet)
+	print 'Start metric', m_start
+	m_best = m_start
+
+	N = opts.Niter
+	r_prev = 0
+	c_max = float(opts.Nsteps * N)
+	c_cur = 0
+	t_est = 0
+	t_start = time.time()
+	for step in range(opts.Nsteps, 0, -1):
+		for iter in range(N):
+			c_cur += 1
+			if c_cur % 100 == 0:
+				iter_per_sec = c_cur / (time.time() - t_start)
+				t_est = (c_max - c_cur) / iter_per_sec
+			sys.stdout.write('Progress: %4d %4d %3d%% %5ds ' % (step, iter, 100. * c_cur / c_max, t_est))
+			sys.stdout.write('%5.2fx %5.2f %%\r' % (m_start / m_best, r_prev))
+			sys.stdout.flush()
+			def shuffleFiles(fi, results):
+				changes = {}
+				for move in range(step):
+					idx = random.randint(0, len(fi) - 1)
+					(id, loc, size) = fileInfos[idx]
+					changes[idx] = pool_list[random.randint(0, len(pool_list) - 1)]
+				m_cur = getMetric(fi, changes, curFiles, curSizes, curIDLocSet)
+				results[m_cur] = changes
+			results = {}
+			threads = []
+			shuffleFiles(fileInfos, results)
+#			for t in range(opts.Nthreads):
+#				t = threading.Thread(target = shuffleFiles, args = (fileInfos, results))
+#				t.start()
+#				threads.append(t)
+#			for t in threads:
+#				t.join()
+			m_cur = min(results)
+			if m_cur < m_best:
+				r_prev = (m_best / m_cur - 1) * 100
+				m_best = m_cur
+				best_change = results[m_cur]
+				for idx in best_change:
+					(id, loc, size) = fileInfos[idx]
+					fileInfos[idx] = (id, best_change[idx], size)
+				curFiles, curSizes, curIDLocSet = getPoolOverview(fileInfos)
+
+	print
+	print 'Final metric', m_best
+	return fileInfos
+
+
