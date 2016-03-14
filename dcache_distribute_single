@@ -159,3 +159,25 @@ def optimizeFileInfos_annealing(fileInfos, goalFiles, goalSizes):
 	return fileInfos
 
 
+def getTransferList(fileInfos_old, fileInfos_new):
+	# Calculate transfers
+	def getMap(fi):
+		result_loc = {}
+		result_size = {}
+		for (id, loc, size) in fi:
+			result_loc.setdefault(id, []).append(loc)
+			result_size[id] = size
+		return (result_loc, result_size)
+	oldMap, oldSizeMap = getMap(fileInfos_old)
+	newMap, newSizeMap = getMap(fileInfos_new)
+	assert(len(oldMap) == len(newMap))
+	transferList = []
+	for id in newMap:
+		oldLoc = set(oldMap[id])
+		newLoc = set(newMap[id])
+		sourceLoc = oldLoc.difference(newLoc)
+		targetLoc = newLoc.difference(oldLoc)
+		for s, t in zip(sourceLoc, targetLoc):
+			transferList.append((id, newSizeMap[id], s, t))
+	return transferList
+
