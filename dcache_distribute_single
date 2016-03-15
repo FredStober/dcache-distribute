@@ -180,4 +180,3 @@ def getTransferList(fileInfos_old, fileInfos_new):
 		for s, t in zip(sourceLoc, targetLoc):
 			transferList.append((id, newSizeMap[id], s, t))
 	return transferList
-
