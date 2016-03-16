@@ -180,3 +180,55 @@ def getTransferList(fileInfos_old, fileInfos_new):
 		for s, t in zip(sourceLoc, targetLoc):
 			transferList.append((id, newSizeMap[id], s, t))
 	return transferList
+
+
+def getDistribution(opts):
+	fileInfos = getFileInfos(opts)
+	print '%d files selected!' % len(fileInfos)
+	if len(fileInfos) == 0:
+		sys.exit(0)
+
+	fileInfos_old = list(fileInfos)
+	if opts.load_transfers:
+		transfers_in = json.load(open(opts.load_transfers))
+		print 'Loaded', len(transfers_in), 'transfers'
+		fileInfos = applyTransfers(fileInfos, transfers_in)
+
+	pools = {}
+	for pool in get_pool_infos(dCacheWebHost):
+		if 'space' not in pool:
+			print 'Pool %s skipped - no space information available!' % pool['name']
+			continue
+		pools[pool['name']] = pool
+	pools = dict(filter(lambda (k, v): k.endswith('D_cms'), pools.items()))
+	totalSize = sum(map(lambda (id, loc, size): size, fileInfos))
+	goalFiles = {}
+	goalSizes = {}
+	for pool in pools:
+		poolFrac = pools[pool]['space']['total'] / float(sum(map(lambda p: pools[p]['space']['total'], pools)))
+		goalFiles[pool] = int(poolFrac * len(fileInfos))
+		goalSizes[pool] = int(poolFrac * totalSize)
+
+	fileInfos_new = optimizeFileInfos_annealing(fileInfos, goalFiles, goalSizes)
+	transferList = getTransferList(fileInfos_old, fileInfos_new)
+
+	# Output result of optimizer
+	oldFiles, oldSizes, dummy = getPoolOverview(fileInfos_old)
+	newFiles, newSizes, dummy = getPoolOverview(fileInfos_new)
+	for pool in sorted(pools):
+		if pool not in oldFiles or pool not in goalFiles or pool not in newFiles or pool not in goalSizes:
+			print pool, "  ----- information missing -----"
+			continue
+		print pool,
+		print '%4d' % oldFiles[pool],
+		print '%4d' % goalFiles[pool],
+		print '%4d' % newFiles[pool],
+		print '%6.1f' % (oldSizes[pool] / 1.e9),
+		print '%6.1f' % (goalSizes[pool] / 1.e9),
+		print '%6.1f' % (newSizes[pool] / 1.e9),
+		print
+	print len(transferList), 'transfers out of', len(fileInfos_new), 'files',
+	print '%.1f TB transfer volume' % (sum(map(lambda (id, size, s, t): size, transferList)) / 1.e12)
+	json.dump(transferList, open(opts.store_transfers, 'w'))
+
+getDistribution(opts)
