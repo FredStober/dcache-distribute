@@ -8,7 +8,6 @@ from toolKIT.chimera import dCacheInfo, get_chimera_data
 from toolKIT.dCache import get_pool_infos
 from toolKIT.dCache_distribute import filterMoveable, writeTransferCommands, writeTransferFile
 from toolKIT.lfntools import fn2ddn
-from toolKIT.monitoring import happyface_upload
 
 dCacheWebHost = 'http://192.108.45.36:2288'
 
@@ -243,8 +242,6 @@ def writeDSImbalanceMetric():
 			print ds, packages[ds]['size'], packages[ds]['files'], total_imb_new, total_imb_old
 	fp.close()
 	print 'Written result to', fp.name
-	happyface_upload(expath('~/software/tmp/dcache_distribute_imbalance_metric'))
-	print '... and uploaded it to the HappyFace machine.'
 
 writeDSImbalanceMetric()
 
