@@ -3,8 +3,7 @@
 # (tries to accomplish an optimal distribution via simulated annealing)
 # by Fred Stober (stober@cern.ch)
 
-import sys, os, copy, random, time, threading, optparse
-from toolKIT import json
+import sys, os, copy, random, time, threading, optparse, json
 from toolKIT.utils import expath, progress, get_cached
 from toolKIT.chimera import dCacheInfo, get_chimera_data
 from toolKIT.dCache import get_pool_infos
