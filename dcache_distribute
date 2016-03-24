@@ -3,7 +3,7 @@
 # by Fred Stober (stober@cern.ch)
 
 import sys, os, copy
-from toolKIT.utils import get_cached
+from utils import get_cached
 from toolKIT.chimera import dCacheInfo, get_chimera_data
 from toolKIT.dCache import get_pool_infos
 from toolKIT.dCache_distribute import filterMoveable, writeTransferCommands, writeTransferFile

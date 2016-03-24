@@ -4,7 +4,7 @@
 # by Fred Stober (stober@cern.ch)
 
 import sys, os, copy, random, time, threading, optparse, json
-from toolKIT.utils import get_cached
+from utils import get_cached
 from toolKIT.chimera import dCacheInfo, get_chimera_data
 from toolKIT.dCache import get_pool_infos
 from toolKIT.lfntools import fn2ddn
