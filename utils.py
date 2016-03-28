@@ -32,3 +32,25 @@ def get_cached(cache_file, fun, *args, **kwargs):
 		result = fun(*args, **kwargs)
 		json.dump(result, open(cache_file, 'w'))
 	return json.load(open(cache_file))
+
+# Get pool infos information
+def get_pool_infos(dCacheWebHost):
+	import xml.dom.minidom, webservice_api
+	# Fixme: Use hostname cmsdcacheweb-kit.gridka.de instead of IP
+	data = webservice_api.readURL('%s/info/pools' % dCacheWebHost)
+	dom = xml.dom.minidom.parseString(data)
+	dom_pools = dom.getElementsByTagName('dCache')[0].getElementsByTagName('pools')[0]
+	for dom_pool in dom_pools.getElementsByTagName('pool'):
+		result = {}
+		result['name'] = str(dom_pool.attributes['name'].value)
+		try:
+			dom_poolgroups = dom_pool.getElementsByTagName('poolgroups')[0]
+			for pg in dom_poolgroups.getElementsByTagName('poolgroupref'):
+				result.setdefault('poolgroups', []).append(str(pg.attributes['name'].value))
+
+			dom_space = dom_pool.getElementsByTagName('space')[0]
+			for sm in dom_space.getElementsByTagName('metric'):
+				result.setdefault('space', {})[str(sm.attributes['name'].value)] = float(sm.childNodes[0].data)
+		except:
+			print 'Unable to parse pool info', result['name']
+		yield result
