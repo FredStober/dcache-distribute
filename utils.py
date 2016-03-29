@@ -54,3 +54,15 @@ def get_pool_infos(dCacheWebHost):
 		except:
 			print 'Unable to parse pool info', result['name']
 		yield result
+
+# Translate fn to dataset directory name - go to first non-numeric parent directory
+def fn2ddn(fn):
+	result = fn.rsplit('/', 1)[0]
+	while True:
+		try:
+			tmp = result.rsplit('/', 1)
+			int(tmp[1])
+			result = tmp[0]
+		except:
+			break
+	return result

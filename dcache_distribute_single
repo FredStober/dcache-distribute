@@ -4,9 +4,8 @@
 # by Fred Stober (stober@cern.ch)
 
 import sys, os, copy, random, time, threading, optparse, json
-from utils import get_cached, expath, progress, get_pool_infos
+from utils import get_cached, expath, progress, get_pool_infos, fn2ddn
 from toolKIT.chimera import dCacheInfo, get_chimera_data
-from toolKIT.lfntools import fn2ddn
 from toolKIT.dCache_distribute import filterMoveable, writeTransferCommands
 
 dCacheWebHost = 'http://192.108.45.36:2288'
