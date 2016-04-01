@@ -66,3 +66,14 @@ def fn2ddn(fn):
 		except:
 			break
 	return result
+
+# Filter chimera dump for moveable files
+def filterMoveable(chimera_iter):
+	for entry in chimera_iter:
+		if dCacheInfo.dcache_id not in entry:
+			continue
+		if not entry.get(dCacheInfo.size, 0):
+			continue
+		if not entry.get(dCacheInfo.location, []):
+			continue
+		yield entry
