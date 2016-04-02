@@ -77,3 +77,17 @@ def filterMoveable(chimera_iter):
 		if not entry.get(dCacheInfo.location, []):
 			continue
 		yield entry
+
+# Create dCache script to perform transfers
+def writeTransferCommands(fn, transfer_list):
+	fp = open(fn, 'w')
+	tmp = {}
+	for (dcache_id, size, source, target) in transfer_list:
+		tmp.setdefault(source, {}).setdefault(target, []).append(dcache_id)
+	for source in sorted(tmp):
+		fp.write('\\c %s\n' % source)
+		for target in sorted(tmp[source]):
+			fp.write('migration move -pnfsid=%s %s\n' % (str.join(',', sorted(tmp[source][target])), target))
+		#fp.write('..\n') # "cd .." is wrong (as strange as it seems)
+	fp.close()
+	print 'Written result to', fp.name

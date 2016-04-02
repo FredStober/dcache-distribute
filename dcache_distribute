@@ -3,9 +3,9 @@
 # by Fred Stober (stober@cern.ch)
 
 import sys, os, copy
-from utils import get_cached, expath, progress, get_pool_infos, fn2ddn, filterMoveable
+from utils import get_cached, expath, progress, get_pool_infos, fn2ddn, filterMoveable, writeTransferCommands
 from toolKIT.chimera import dCacheInfo, get_chimera_data
-from toolKIT.dCache_distribute import writeTransferCommands, writeTransferFile
+from toolKIT.dCache_distribute import writeTransferFile
 
 dCacheWebHost = 'http://192.108.45.36:2288'
 
