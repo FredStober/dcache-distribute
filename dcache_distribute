@@ -5,7 +5,11 @@
 import sys, os, copy
 from utils import get_cached, expath, progress, get_pool_infos, fn2ddn, filterMoveable, writeTransferCommands
 from toolKIT.chimera import dCacheInfo, get_chimera_data
-from toolKIT.dCache_distribute import writeTransferFile
+
+# Write transfer file
+def writeTransferFile(fn, transfer_list):
+	json.dump(transfer_list, open(fn, 'w'))
+	print 'Written result to', fn
 
 dCacheWebHost = 'http://192.108.45.36:2288'
 
