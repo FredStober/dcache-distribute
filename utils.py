@@ -91,3 +91,28 @@ def writeTransferCommands(fn, transfer_list):
 		#fp.write('..\n') # "cd .." is wrong (as strange as it seems)
 	fp.close()
 	print 'Written result to', fp.name
+
+# Read compressed chimera data
+def get_chimera_data(fn):
+	dn = None
+	def fmtLoc(loc):
+		loc = loc.strip()
+		if not loc.startswith('f'):
+			loc = 'osm:' + loc
+		return loc
+	fp = open(fn, 'r')
+	for line in fp:
+		if not line.strip():
+			continue
+		if line.startswith('/'):
+			dn = line.strip()
+		else:
+			result = dict(zip([dCacheInfo.pfn, dCacheInfo.dcache_id, dCacheInfo.adler32,
+				dCacheInfo.size, dCacheInfo.atime, dCacheInfo.location], line.split('\t')))
+			result[dCacheInfo.pfn] = dn.rstrip('/') + '/' + result[dCacheInfo.pfn]
+			result[dCacheInfo.size] = int(result[dCacheInfo.size])
+			result[dCacheInfo.atime] = int(result[dCacheInfo.atime])
+			if dCacheInfo.location in result:
+				result[dCacheInfo.location] = map(fmtLoc, result.get(dCacheInfo.location, '').split(','))
+			yield result
+	fp.close()

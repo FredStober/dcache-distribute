@@ -3,8 +3,8 @@
 # by Fred Stober (stober@cern.ch)
 
 import sys, os, copy
-from utils import get_cached, expath, progress, get_pool_infos, fn2ddn, filterMoveable, writeTransferCommands
-from toolKIT.chimera import dCacheInfo, get_chimera_data
+from utils import get_cached, expath, progress, get_pool_infos, fn2ddn, filterMoveable, writeTransferCommands, get_chimera_data
+from toolKIT.chimera import dCacheInfo
 
 # Write transfer file
 def writeTransferFile(fn, transfer_list):
