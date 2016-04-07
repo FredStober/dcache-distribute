@@ -1,3 +1,8 @@
+
+dCacheInfo = type('dCacheInfo', (),
+	dict(map(lambda (idx, name): (name, idx + sum(map(ord, 'dCacheInfo'))), enumerate(
+		['pfn', 'dcache_id', 'adler32', 'size', 'atime', 'storage_group', 'location']))))
+
 def expath(fn):
 	return os.path.realpath(os.path.expanduser(fn))
 
