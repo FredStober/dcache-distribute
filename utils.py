@@ -122,3 +122,9 @@ def get_chimera_data(fn):
 				result[dCacheInfo.location] = map(fmtLoc, result.get(dCacheInfo.location, '').split(','))
 			yield result
 	fp.close()
+
+log = logging.getLogger('webservice')
+
+def user_agent(value):
+	user_agent.value = value
+user_agent.value = 'toolKIT/0.1'
