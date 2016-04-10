@@ -128,3 +128,18 @@ log = logging.getLogger('webservice')
 def user_agent(value):
 	user_agent.value = value
 user_agent.value = 'toolKIT/0.1'
+
+def removeUnicode(obj):
+	if type(obj) in (list, tuple, set):
+		(obj, oldType) = (list(obj), type(obj))
+		for i, v in enumerate(obj):
+			obj[i] = removeUnicode(v)
+		obj = oldType(obj)
+	elif isinstance(obj, dict):
+		result = {}
+		for k, v in obj.iteritems():
+			result[removeUnicode(k)] = removeUnicode(v)
+		return result
+	elif isinstance(obj, unicode):
+		return str(obj)
+	return obj
