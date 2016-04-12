@@ -143,3 +143,33 @@ def removeUnicode(obj):
 	elif isinstance(obj, unicode):
 		return str(obj)
 	return obj
+
+def readURL(url, params = None, headers = {}, cert = None):
+	headers.setdefault('User-Agent', user_agent.value)
+
+	import urllib, urllib2, httplib
+
+	class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
+		def __init__(self, key, cert):
+			urllib2.HTTPSHandler.__init__(self)
+			(self.key, self.cert) = (key, cert)
+		def https_open(self, req):
+			return self.do_open(self.getConnection, req)
+		def getConnection(self, host, timeout = None):
+			return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+
+	if cert:
+		cert_handler = HTTPSClientAuthHandler(cert, cert)
+		opener = urllib2.build_opener(cert_handler)
+		urllib2.install_opener(opener)
+
+	url_arg = None
+	if params:
+		url_arg = urllib.urlencode(params, doseq=True)
+	log.info('Starting http query: %r %r' % (url, url_arg))
+	log.debug('Connecting with header: %r' % headers)
+	try:
+		return urllib2.urlopen(urllib2.Request(url, url_arg, headers)).read()
+	except:
+		print 'Unable to open', url, 'with arguments', url_arg, 'and header', headers
+		raise
