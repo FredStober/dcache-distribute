@@ -1,4 +1,4 @@
-import os, time
+import os, time, json
 
 dCacheInfo = type('dCacheInfo', (),
 	dict(map(lambda (idx, name): (name, idx + sum(map(ord, 'dCacheInfo'))), enumerate(
@@ -33,7 +33,6 @@ def progress(iter, step = 1000, enable = True, speed = True):
 
 
 def get_cached(cache_file, fun, *args, **kwargs):
-	import json
 	if not os.path.exists(cache_file):
 		result = fun(*args, **kwargs)
 		json.dump(result, open(cache_file, 'w'))
