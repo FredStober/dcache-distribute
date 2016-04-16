@@ -1,4 +1,4 @@
-import os, time, json
+import os, sys, time, json, logging
 import xml.dom.minidom
 
 dCacheInfo = type('dCacheInfo', (),
@@ -42,7 +42,7 @@ def get_cached(cache_file, fun, *args, **kwargs):
 # Get pool infos information
 def get_pool_infos(dCacheWebHost):
 	# Fixme: Use hostname cmsdcacheweb-kit.gridka.de instead of IP
-	data = webservice_api.readURL('%s/info/pools' % dCacheWebHost)
+	data = readURL('%s/info/pools' % dCacheWebHost)
 	dom = xml.dom.minidom.parseString(data)
 	dom_pools = dom.getElementsByTagName('dCache')[0].getElementsByTagName('pools')[0]
 	for dom_pool in dom_pools.getElementsByTagName('pool'):
