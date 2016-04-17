@@ -133,12 +133,6 @@ def optimizeFileInfos_annealing(fileInfos, goalFiles, goalSizes):
 			results = {}
 			threads = []
 			shuffleFiles(fileInfos, results)
-#			for t in range(opts.Nthreads):
-#				t = threading.Thread(target = shuffleFiles, args = (fileInfos, results))
-#				t.start()
-#				threads.append(t)
-#			for t in threads:
-#				t.join()
 			m_cur = min(results)
 			if m_cur < m_best:
 				r_prev = (m_best / m_cur - 1) * 100
