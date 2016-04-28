@@ -15,9 +15,6 @@ parser.add_option("-h", "--host", dest="host", default='http://192.108.45.36:228
 opts, args = parser.parse_args()
 
 # Play back old storage 
-#from toolKIT.chimera import cache_chimera_data
-#cache_chimera_data(expath('~/storage_scratch/chimera-dump'),
-#	expath('~/storage_scratch/storage-information'), 201407160705)
 chimera_path = expath('~/storage_scratch/chimera-dump/current')
 
 
