@@ -6,8 +6,6 @@
 import sys, os, copy, random, time, threading, optparse, json
 from utils import get_cached, expath, progress, get_pool_infos, fn2ddn, filterMoveable, writeTransferCommands, get_chimera_data, dCacheInfo
 
-chimera_path = expath('~/storage_scratch/chimera-dump/current')
-
 parser = optparse.OptionParser()
 parser.add_option("-h", "--host", dest="host", default='http://192.108.45.36:2288', help="select by dcache host")
 parser.add_option("-f", "--filename", dest="fn", default=None, help="select by filename")
@@ -21,6 +19,8 @@ parser.add_option("-i", "--iterations", dest="Niter", default=100, type=int, hel
 parser.add_option("-s", "--max_steps", dest="Nsteps", default=36, type=int, help="number of steps")
 parser.add_option("-T", "--store_transfers", dest="store_transfers", default='transfers', help="store transfers")
 opts, args = parser.parse_args()
+
+chimera_path = expath('~/storage_scratch/chimera-dump/current')
 
 # Select files according to lfn / number of files in dataset
 def getFileInfos(opts):
