@@ -7,16 +7,13 @@ from utils import get_cached, expath, progress, get_pool_infos, fn2ddn, filterMo
 
 parser = optparse.OptionParser()
 parser.add_option("-h", "--host", dest="host", default='http://192.108.45.36:2288', help="select by dcache host")
+parser.add_option("-c", "--chimera", dest="chimera", default=expath('~/storage_scratch/chimera-dump/current'), help="select by chimera source file")
 opts, args = parser.parse_args()
 
 # Write transfer file
 def writeTransferFile(fn, transfer_list):
 	json.dump(transfer_list, open(fn, 'w'))
 	print 'Written result to', fn
-
-# Play back old storage 
-chimera_path = expath('~/storage_scratch/chimera-dump/current')
-
 
 def getPoolOverview():
 	result_flat = {}
@@ -38,7 +35,7 @@ def getPoolOverview():
 # Return dictionary ds -> {'files': ds files, 'size': ds size, <pool>: size on pool, ...}
 def getDataPackagesBefore():
 	result = {}
-	iter_chimera = get_chimera_data(chimera_path)
+	iter_chimera = get_chimera_data(opts.chimera)
 	for entry in filterMoveable(progress(iter_chimera)):
 		ds = fn2ddn(entry[dCacheInfo.pfn])
 		ds_dict = result.setdefault(ds, {})
@@ -82,7 +79,7 @@ def getPoolTargetSize(packages, pools):
 def getTransfers(ds_imbalance):
 	result = []
 	result_packages = {}
-	iter_chimera = get_chimera_data(chimera_path)
+	iter_chimera = get_chimera_data(opts.chimera)
 	for entry in filterMoveable(progress(iter_chimera)):
 		ds = fn2ddn(entry[dCacheInfo.pfn])
 		if ds not in ds_imbalance:
@@ -165,7 +162,7 @@ def getDSPoolTransfers(packages, pool_imbalance):
 def getFileTransfersFromPoolsTransfers(pool_transfers, pool_imbalance):
 	result = []
 	result_packages = {}
-	iter_chimera = get_chimera_data(chimera_path)
+	iter_chimera = get_chimera_data(opts.chimera)
 	for entry in filterMoveable(progress(iter_chimera)):
 		ds = fn2ddn(entry[dCacheInfo.pfn])
 		if ds not in pool_transfers:
